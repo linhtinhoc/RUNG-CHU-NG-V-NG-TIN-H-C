@@ -1,0 +1,29 @@
+name: Run Google AI Studio App
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch: # Giúp bạn có thể bấm nút chạy thủ công trên GitHub
+
+jobs:
+  run-ai-app:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Install Google GenAI SDK
+      run: |
+        pip install google-genai
+
+    - name: Run AI Script
+      env:
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }} # Lấy API từ mật mật của GitHub
+      run: |
+        python main.py
