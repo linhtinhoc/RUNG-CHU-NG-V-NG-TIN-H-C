@@ -1,0 +1,6 @@
+{
+  "name": "RUNG CHUÔNG VÀNG – LINH TIN HỌC",
+  "description": "Ứng dụng trò chơi giáo dục Rung Chuông Vàng môn Tin học lớp 3, 4, 5 theo Chương trình GDPT 2018 với ngân hàng câu hỏi chuẩn SGK, tùy chỉnh thời gian, chế độ cá nhân và thi đấu đồng đội.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
