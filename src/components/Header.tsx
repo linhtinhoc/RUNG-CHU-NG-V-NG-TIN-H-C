@@ -14,11 +14,12 @@ import {
   Award,
   HelpCircle,
   Gamepad2,
+  QrCode,
 } from 'lucide-react';
 
 interface HeaderProps {
-  currentTab: 'play' | 'bank' | 'ai' | 'history' | 'guide' | 'data';
-  setCurrentTab: (tab: 'play' | 'bank' | 'ai' | 'history' | 'guide' | 'data') => void;
+  currentTab: 'play' | 'bank' | 'ai' | 'history' | 'guide' | 'data' | 'share';
+  setCurrentTab: (tab: 'play' | 'bank' | 'ai' | 'history' | 'guide' | 'data' | 'share') => void;
   isGameActive: boolean;
 }
 
@@ -116,6 +117,19 @@ export const Header: React.FC<HeaderProps> = ({ currentTab, setCurrentTab, isGam
               >
                 <Gamepad2 className="w-4 h-4" />
                 <span className="hidden lg:inline">Trò chơi</span>
+              </button>
+
+              <button
+                onClick={() => setCurrentTab('share')}
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm ${
+                  currentTab === 'share'
+                    ? 'bg-gradient-to-r from-amber-400 to-yellow-400 text-blue-950'
+                    : 'bg-emerald-600/90 hover:bg-emerald-500 text-white'
+                }`}
+                title="Mã QR & Link cho học sinh quét điện thoại tham gia (Không cần Gmail)"
+              >
+                <QrCode className="w-4 h-4 text-amber-300" />
+                <span>Mã QR</span>
               </button>
 
               <button

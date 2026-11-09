@@ -21,6 +21,7 @@ import {
   HelpCircle,
   Settings2,
   Search,
+  QrCode,
 } from 'lucide-react';
 
 interface LobbyViewProps {
@@ -28,6 +29,7 @@ interface LobbyViewProps {
   onOpenQuestionBank: () => void;
   onOpenAiGenerator: () => void;
   onOpenGuide: () => void;
+  onOpenShareQr?: () => void;
 }
 
 export const LobbyView: React.FC<LobbyViewProps> = ({
@@ -35,6 +37,7 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
   onOpenQuestionBank,
   onOpenAiGenerator,
   onOpenGuide,
+  onOpenShareQr,
 }) => {
   const {
     books,
@@ -245,6 +248,16 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
               <Play className="w-5 h-5 fill-current" />
               BẮT ĐẦU VÒNG THI
             </button>
+            {onOpenShareQr && (
+              <button
+                onClick={onOpenShareQr}
+                className="bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold px-4 py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 shadow-md transition-all border border-emerald-400/50"
+                title="Chiếu mã QR để học sinh quét điện thoại tham gia thi (Không cần Gmail)"
+              >
+                <QrCode className="w-4 h-4 text-amber-300" />
+                <span>Mã QR học sinh quét tham gia</span>
+              </button>
+            )}
             <div className="flex gap-2">
               <button
                 onClick={onOpenAiGenerator}
@@ -1116,13 +1129,24 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
             >
               ← Quay lại chỉnh sửa thiết lập
             </button>
-            <button
-              onClick={handleStartGame}
-              className="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 hover:from-amber-400 hover:to-yellow-300 text-blue-950 font-black text-lg shadow-xl shadow-amber-500/30 flex items-center justify-center gap-2 transform hover:scale-105 active:scale-95 transition-all"
-            >
-              <Play className="w-5 h-5 fill-current" />
-              BẮT ĐẦU VÒNG THI NGAY
-            </button>
+            <div className="flex flex-col sm:flex-row items-center gap-2.5 w-full sm:w-auto">
+              {onOpenShareQr && (
+                <button
+                  onClick={onOpenShareQr}
+                  className="w-full sm:w-auto px-5 py-3 rounded-2xl bg-emerald-700 hover:bg-emerald-600 text-white font-black text-sm shadow-md flex items-center justify-center gap-2 border border-emerald-400 cursor-pointer"
+                >
+                  <QrCode className="w-5 h-5 text-amber-300" />
+                  Mã QR cho học sinh quét điện thoại
+                </button>
+              )}
+              <button
+                onClick={handleStartGame}
+                className="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 hover:from-amber-400 hover:to-yellow-300 text-blue-950 font-black text-lg shadow-xl shadow-amber-500/30 flex items-center justify-center gap-2 transform hover:scale-105 active:scale-95 transition-all"
+              >
+                <Play className="w-5 h-5 fill-current" />
+                BẮT ĐẦU VÒNG THI NGAY
+              </button>
+            </div>
           </div>
         </div>
       )}

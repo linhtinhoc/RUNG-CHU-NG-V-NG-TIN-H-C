@@ -1,17 +1,22 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useGame } from '../context/GameContext';
-import { Award, Trophy, Clock, X, Calendar, User, Shield } from 'lucide-react';
+import { Award, Trophy, Clock, X, Calendar, User, Shield, FileSpreadsheet } from 'lucide-react';
+import { GlobalLeaderboardSection } from './GlobalLeaderboardSection';
 
 interface HistoryModalProps {
   onClose: () => void;
 }
 
 export const HistoryModal: React.FC<HistoryModalProps> = ({ onClose }) => {
-  const { gameHistory } = useGame();
+  const { gameHistory, activeGrade, activeBookId, activeLessonId, activeQuestionSetId, books, lessons, questionSets } = useGame();
+  const currentBook = books.find(b => b.id === activeBookId);
+  const currentLesson = lessons.find(l => l.id === activeLessonId);
+  const currentSet = questionSets.find(s => s.id === activeQuestionSetId);
+  const [activeTab, setActiveTab] = useState<'global_leaderboard' | 'game_history'>('global_leaderboard');
 
   return (
     <div className="fixed inset-0 z-50 bg-black/75 flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
-      <div className="bg-white rounded-3xl max-w-4xl w-full p-6 shadow-2xl space-y-5 max-h-[90vh] flex flex-col border border-gray-200">
+      <div className="bg-white rounded-3xl max-w-5xl w-full p-5 sm:p-6 shadow-2xl space-y-4 max-h-[92vh] flex flex-col border border-gray-200">
         <div className="flex items-center justify-between border-b pb-3">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-amber-500 text-blue-950 flex items-center justify-center shadow-md">
@@ -19,10 +24,10 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({ onClose }) => {
             </div>
             <div>
               <h2 className="text-xl font-black text-blue-950 uppercase">
-                Bảng vàng thành tích Rung Chuông Vàng
+                Bảng vàng thành tích & Thống kê học sinh
               </h2>
               <p className="text-xs text-gray-500 font-medium">
-                Ghi nhận kết quả các vòng thi đấu của học sinh và các đội
+                Thống kê học sinh, điểm số, huy hiệu vinh danh và xuất dữ liệu sang Google Sheets
               </p>
             </div>
           </div>
@@ -34,7 +39,44 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({ onClose }) => {
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto space-y-3 pr-1 text-xs">
+        {/* Tab switcher */}
+        <div className="flex items-center gap-2 border-b border-gray-100 pb-2">
+          <button
+            onClick={() => setActiveTab('global_leaderboard')}
+            className={`px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-2 ${
+              activeTab === 'global_leaderboard'
+                ? 'bg-amber-400 text-blue-950 shadow-md'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+          >
+            <FileSpreadsheet className="w-4 h-4" />
+            Bảng vinh danh toàn cầu & Thống kê Google Sheets
+          </button>
+
+          <button
+            onClick={() => setActiveTab('game_history')}
+            className={`px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-2 ${
+              activeTab === 'game_history'
+                ? 'bg-amber-400 text-blue-950 shadow-md'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+          >
+            <Trophy className="w-4 h-4" />
+            Lịch sử vòng thi đã đấu ({gameHistory.length})
+          </button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto pr-1">
+          {activeTab === 'global_leaderboard' ? (
+            <GlobalLeaderboardSection
+              grade={activeGrade}
+              bookName={currentBook?.name || 'SGK Tin học'}
+              lessonTitle={currentLesson?.title || 'Bài học Tin học'}
+              questionSetTitle={currentSet?.title || 'Bộ đề thi'}
+              mode="individual"
+            />
+          ) : (
+            <div className="space-y-3 text-xs">
           {gameHistory.length === 0 ? (
             <div className="text-center py-16 text-gray-400 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
               <Trophy className="w-12 h-12 mx-auto text-gray-300 mb-2" />
@@ -76,6 +118,8 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({ onClose }) => {
                 </div>
               </div>
             ))
+          )}
+            </div>
           )}
         </div>
 

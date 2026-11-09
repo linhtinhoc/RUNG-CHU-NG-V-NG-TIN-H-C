@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Book, Difficulty, GameHistoryEntry, Grade, Lesson, Question, QuestionSet } from '../types/game';
 import { DEFAULT_BOOKS, DEFAULT_LESSONS, DEFAULT_QUESTION_SETS } from '../data/defaultData';
 import { validateQuestionSetJSON } from '../utils/gameRules';
+import { saveQuestionToBackend, deleteQuestionFromBackend, fetchSavedQuestions } from '../services/questionsApi';
 
 const STORAGE_KEY_BOOKS = 'rcv_books_v1';
 const STORAGE_KEY_LESSONS = 'rcv_lessons_v1';
@@ -134,6 +135,29 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [gameHistory]);
 
+  // Reconcile permanently saved questions from backend on initial mount
+  useEffect(() => {
+    fetchSavedQuestions()
+      .then(remoteQuestions => {
+        if (remoteQuestions && remoteQuestions.length > 0) {
+          setQuestionSets(prev => {
+            return prev.map(s => {
+              const extra = remoteQuestions.filter((q: any) => q.setId === s.id);
+              if (extra.length === 0) return s;
+              const existingIds = new Set(s.questions.map(q => q.id));
+              const newQuestions = extra.filter(q => !existingIds.has(q.id));
+              if (newQuestions.length === 0) return s;
+              return {
+                ...s,
+                questions: [...s.questions, ...newQuestions],
+              };
+            });
+          });
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   const addToast = (text: string, type: 'success' | 'error' | 'info' = 'info') => {
     const id = Date.now().toString() + Math.random().toString().slice(2, 6);
     setToasts(prev => [...prev, { id, text, type }]);
@@ -257,6 +281,13 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       })
     );
 
+    // Save permanently to backend database
+    saveQuestionToBackend(newQ, setId).then(res => {
+      if (res.success) {
+        addToast('Đã lưu câu hỏi vĩnh viễn vào hệ thống!', 'success');
+      }
+    }).catch(() => {});
+
     addToast('Đã thêm câu hỏi mới thành công!', 'success');
     return newQ;
   };
@@ -290,6 +321,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return s;
       })
     );
+
+    deleteQuestionFromBackend(questionId).catch(() => {});
     addToast('Đã xóa câu hỏi khỏi bộ!', 'info');
   };
 

@@ -19,7 +19,9 @@ import {
   Users,
   Shield,
   HelpCircle,
+  QrCode,
 } from 'lucide-react';
+import { ShareQrModal } from './ShareQrModal';
 
 interface GameStageProps {
   questions: Question[];
@@ -62,6 +64,7 @@ export const GameStage: React.FC<GameStageProps> = ({
   const [isTimeUp, setIsTimeUp] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
+  const [showShareQr, setShowShareQr] = useState(false);
 
   // Timer state
   const questionDuration = currentQuestion?.customTimeSeconds || settings.globalTimeSeconds || 20;
@@ -466,6 +469,17 @@ export const GameStage: React.FC<GameStageProps> = ({
           {/* Quick Stage Controls */}
           <div className="flex items-center gap-1 pl-2 border-l border-white/20">
             <button
+              onClick={() => {
+                setIsPaused(true);
+                setShowShareQr(true);
+              }}
+              aria-label="Mã QR cho học sinh"
+              className="p-2 rounded-xl bg-emerald-700/80 hover:bg-emerald-600 text-white transition-colors"
+              title="Chiếu mã QR cho học sinh quét tham gia (Không cần Gmail)"
+            >
+              <QrCode className="w-4 h-4 text-amber-300" />
+            </button>
+            <button
               onClick={() => setIsPaused(prev => !prev)}
               disabled={isAnswered || isTimeUp}
               aria-label={isPaused ? 'Tiếp tục' : 'Tạm dừng'}
@@ -761,6 +775,11 @@ export const GameStage: React.FC<GameStageProps> = ({
             </div>
           </div>
         </div>
+      )}
+
+      {/* SHARE QR MODAL (CAN BE ACCESSED MID-GAME) */}
+      {showShareQr && (
+        <ShareQrModal onClose={() => setShowShareQr(false)} />
       )}
     </div>
   );

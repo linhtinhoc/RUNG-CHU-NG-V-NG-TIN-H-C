@@ -9,6 +9,8 @@ import { AiGeneratorModal } from './components/AiGeneratorModal';
 import { TeacherGuideModal } from './components/TeacherGuideModal';
 import { ImportExportModal } from './components/ImportExportModal';
 import { HistoryModal } from './components/HistoryModal';
+import { ShareQrModal } from './components/ShareQrModal';
+import { StudentPlayView } from './components/StudentPlayView';
 import { GameMode, GameSettings, PlayerScore, Question, TeamScore } from './types/game';
 import { filterAndPrepareQuestions } from './utils/gameRules';
 import { CheckCircle2, AlertCircle, Info, X } from 'lucide-react';
@@ -27,11 +29,21 @@ function AppContent() {
     saveGameHistory,
   } = useGame();
 
+  // Student QR Mode detection (?code=... or ?join=1)
+  const [isStudentMode, setIsStudentMode] = useState<boolean>(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('join') === '1' || !!params.get('code');
+  });
+  const [studentRoomCode] = useState<string>(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('code') || '';
+  });
+
   // Screen State: 'lobby' | 'playing' | 'results'
   const [screen, setScreen] = useState<'lobby' | 'playing' | 'results'>('lobby');
 
   // Modals
-  const [activeModal, setActiveModal] = useState<'bank' | 'ai' | 'guide' | 'data' | 'history' | null>(null);
+  const [activeModal, setActiveModal] = useState<'bank' | 'ai' | 'guide' | 'data' | 'history' | 'share' | null>(null);
 
   // Active Game State
   const [activeGameSettings, setActiveGameSettings] = useState<GameSettings | null>(null);
@@ -146,6 +158,19 @@ function AppContent() {
     setScreen('playing');
   };
 
+  // If student joined via QR code or shared link (?code=... or ?join=1)
+  if (isStudentMode) {
+    return (
+      <StudentPlayView
+        initialRoomCode={studentRoomCode}
+        onExit={() => {
+          setIsStudentMode(false);
+          window.history.replaceState({}, '', window.location.pathname);
+        }}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-100 flex flex-col font-sans text-gray-900">
       {/* Toast Notifications */}
@@ -194,6 +219,7 @@ function AppContent() {
             onOpenQuestionBank={() => setActiveModal('bank')}
             onOpenAiGenerator={() => setActiveModal('ai')}
             onOpenGuide={() => setActiveModal('guide')}
+            onOpenShareQr={() => setActiveModal('share')}
           />
         )}
 
@@ -235,6 +261,7 @@ function AppContent() {
       {activeModal === 'guide' && <TeacherGuideModal onClose={() => setActiveModal(null)} />}
       {activeModal === 'data' && <ImportExportModal onClose={() => setActiveModal(null)} />}
       {activeModal === 'history' && <HistoryModal onClose={() => setActiveModal(null)} />}
+      {activeModal === 'share' && <ShareQrModal onClose={() => setActiveModal(null)} />}
     </div>
   );
 }

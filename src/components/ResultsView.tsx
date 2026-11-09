@@ -19,7 +19,9 @@ import {
   Star,
   ChevronDown,
   ChevronUp,
+  FileSpreadsheet,
 } from 'lucide-react';
+import { GlobalLeaderboardSection } from './GlobalLeaderboardSection';
 
 interface ResultsViewProps {
   results: {
@@ -269,6 +271,18 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
         </button>
 
         <button
+          onClick={() => {
+            const el = document.getElementById('global-leaderboard-section');
+            el?.scrollIntoView({ behavior: 'smooth' });
+          }}
+          className="px-4 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm flex items-center gap-1.5 shadow"
+          title="Xem bảng vinh danh học sinh và xuất dữ liệu ra Google Sheets"
+        >
+          <FileSpreadsheet className="w-4 h-4" />
+          Bảng vinh danh & Google Sheets
+        </button>
+
+        <button
           onClick={onChangeSet}
           className="px-4 py-3 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold text-sm flex items-center gap-1.5"
         >
@@ -290,6 +304,18 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
           <Home className="w-4 h-4" />
           Trang chủ
         </button>
+      </div>
+
+      {/* GLOBAL LEADERBOARD & GOOGLE SHEETS STUDENT STATS */}
+      <div id="global-leaderboard-section" className="pt-2">
+        <GlobalLeaderboardSection
+          currentSessionResults={results}
+          grade={grade}
+          bookName={bookName}
+          lessonTitle={lessonTitle}
+          questionSetTitle={questionSetTitle}
+          mode={mode}
+        />
       </div>
 
       {/* ANSWER REVIEW MODAL */}
